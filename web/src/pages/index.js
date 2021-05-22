@@ -10,6 +10,8 @@ import Container from "../components/container";
 import GraphQLErrorList from "../components/graphql-error-list";
 import SEO from "../components/seo";
 import Layout from "../containers/layout";
+import EventList from '../components/event-list';
+import EventForm from '../components/event-form';
 
 export const query = graphql`
   fragment SanityImage on SanityMainImage {
@@ -68,6 +70,26 @@ export const query = graphql`
           }
         }
       }
+    },
+    events: allSanityEvent(
+      sort: {
+        fields: [dateAndTime]
+        order: ASC
+      },
+    ) {
+      edges {
+        node {
+          id
+          _id
+          name
+          dateAndTime
+          venue {
+            name
+          }
+          virtual
+          eventUrl
+        }
+      }
     }
   }
 `;
@@ -89,6 +111,9 @@ const IndexPage = (props) => {
         .filter(filterOutDocsWithoutSlugs)
         .filter(filterOutDocsPublishedInTheFuture)
     : [];
+  const eventNodes = (data || {}).events
+    ? mapEdgesToNodes(data.events)
+    : []
   const venueNodes = (data || {}).venues
     ? mapEdgesToNodes(data.venues)
     : []
@@ -115,59 +140,15 @@ const IndexPage = (props) => {
             browseMoreHref="/archive/"
           />
         )}
-        <form name='propose-event' method='POST' data-netlify='true' >
-          <input type='hidden' name='form-name' value='propose-event' />
-          <div className='field'>
-            <label className='label'>Full name:
-              <input className='input' type='text' name='name'/>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Email:
-              <input className='input' type='email' name='email'/>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Event Title:
-              <input className='input' type='text' name='eventTitle'/>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Date:
-              <input className='input' type='datetime-local' name='date'/>
-            </label>
-          </div>
-          <div className="field">
-            <label className="label">Venue:
-              <select className="select" name="venue">
-                {
-                  venueNodes && venueNodes.map((venue) => (
-                    <option id={venue._id} value={venue._id}>{venue.name}</option>
-                  ))
-                }
-              </select>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Virtual:
-              <input className='input' type='checkbox' name='virtual'/>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Event url:
-              <input className='input' type='text' name='eventUrl'/>
-            </label>
-          </div>
-          <div className='field'>
-            <label className='label'>Message:
-              <textarea className='textarea' name='message'></textarea>
-            </label>
-          </div>
-          <div className='field'>
-            <button className='button' type='submit'>Send
-            </button>
-          </div>
-        </form>
+        <EventList
+          eventNodes={eventNodes}
+          title='Events'
+        />
+
+        <EventForm
+          venueNodes={venueNodes}
+          title='Add an Event'
+        />
       </Container>
     </Layout>
   );
