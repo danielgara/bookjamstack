@@ -2,7 +2,7 @@ const sanityClient = require('@sanity/client')
 const client = sanityClient({
   projectId: 'dhwp3t7w',
   dataset: 'production',
-  token: process.env.SANITY_STUDIO_ADD_EVENT
+  token: process.env.SANITY_STUDIO_PROPOSE_EVENT
 })
 exports.handler = async function (event, context, callback) {
   const {payload} = JSON.parse(event.body)
