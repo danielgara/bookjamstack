@@ -32,6 +32,11 @@ export default {
       name: 'body',
       type: 'bodyPortableText',
       title: 'Body'
-    }
+    },
+    {
+      name: 'approved',
+      type: 'boolean',
+      title: 'Approved'
+    },
   ]
 }
